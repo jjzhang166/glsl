@@ -1,0 +1,76 @@
+//@ME 
+//Stones
+//TODO: colors, cover with moss, ...
+
+#ifdef GL_ES
+precision highp float;
+#endif
+
+uniform float time;
+uniform vec2 mouse;
+uniform vec2 resolution;
+uniform vec2 reyboard;
+
+mat2 m = mat2( 0.80,  0.60, -0.60,  0.80 );
+
+float hash( float n )
+{
+	return fract(sin(n)*43758.5453);
+}
+
+float noise( in vec2 x )
+{
+	vec2 p = floor(x);
+	vec2 f = fract(x);
+    	f = f*f*(3.0-2.0*f);
+    	float n = p.x + p.y*57.0;
+    	float res = mix(mix( hash(n+  0.0), hash(n+  1.0),f.x), mix( hash(n+ 57.0), hash(n+ 58.0),f.x),f.y);
+    	return res;
+}
+
+float fbm( vec2 p )
+{
+    	float f = 0.0;
+    	f += 0.50000*noise( p ); p = m*p*2.02;
+    	f += 0.25000*noise( p ); p = m*p*1.03;
+    	f += 0.12500*noise( p ); p = m*p*1.01;
+
+    	return f/0.825;
+}
+
+vec3 thing(vec2 pos) 
+{
+	float offset = 0.;
+	float row = floor((pos.y)/1.0);
+	if (mod(row, 2.0) < 1.0)
+		offset = 0.5;
+	
+
+	vec2 q = pos;
+	q.y *= 5.0;
+	float n1 = fbm(q * 3.0);
+	pos.x=fract(pos.x + offset +.5)-0.5;
+	pos.y=fract(pos.y+.5)-0.5;
+	pos = abs( pos);
+	pos += mod(pos, 0.933)*40.0;
+	float r = length(pos );
+   	float a = atan(pos.y, pos.x);
+	float b = atan(pos.x, pos.y);
+	float n2 = fbm(pos) * (a * b);
+	float n3 = n1 * 0.5 / n2 * 0.75;
+	
+	float s = (min(pos.x,pos.y)-0.25) / length(pos) / sqrt(pos.x * pos.y) * 0.0125 - n3;
+	vec3 color = vec3(mix(s, 1.-n1, 0.5));
+	color = mix(color, fbm(pos*0.024) * vec3(0.5487,.3,.24781), 0.35);
+	color -= vec3(0.687,.743,.645781) * fbm(pos * 25.) * 0.3;
+	return color;
+}
+
+void main(void) 
+{
+	vec2 position = ( gl_FragCoord.xy / resolution );
+	vec2 world = position * 10.0;
+	world.x *= resolution.x / resolution.y;
+	vec3 dist = thing(world)+0.75;
+	gl_FragColor = vec4( dist, 1.0 );
+}

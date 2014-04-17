@@ -1,0 +1,1 @@
+precision lowp float;uniform float time;uniform vec2 resolution;void main(){vec2 u=gl_FragCoord.xy/resolution+vec2(20.,11.+fract(time));gl_FragColor=vec4(fract(u.y*u.x*u.y*u.x*90.));}

@@ -1,0 +1,1 @@
+uniform lowp float time;void main(){gl_FragColor.s=abs(sin(time));}

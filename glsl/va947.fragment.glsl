@@ -1,0 +1,28 @@
+// modified ekg effect
+
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+uniform float time;
+uniform vec2 mouse;
+uniform vec2 resolution;
+
+float viewAngle = 1.0;
+float speed = 2.0;
+float rate = 9.0;
+float baseamp = 0.60;
+
+void main(void)
+{
+  vec2 p = 1.0 * ( gl_FragCoord.y / resolution.xy );
+  float x = speed * viewAngle * time + rate * p.x;
+  float base = (1.0 + cos(x*2.5 + time)) * (1.0 + sin(x*3.5 + time));
+  float z = cos(0.9*x);
+  //z = max(z, 1.0-z);
+  z = (z, 4.0);
+  float pulse = exp(0.5 * z);
+  vec4 ecg_color = vec4(24, 128.0, 24, 0.5);
+  vec4 c = pow(clamp(1.0-abs(p.y-(baseamp*base+pulse)), 0.0, 1.0), 6.0) * ecg_color;
+  gl_FragColor = c * pulse;
+}

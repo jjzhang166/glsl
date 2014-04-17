@@ -1,0 +1,5 @@
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+uniform float time; uniform vec2 resolution; uniform vec2 mouse; void main(void) {vec3 color = vec3(1, 1, 1); vec3 color_01; vec2 Point = mouse * resolution; vec2 PointCentre = resolution / 2.0; vec3 UserColor; if(gl_FragCoord.x - PointCentre.x > 0.0) {if(gl_FragCoord.y - PointCentre.y > 0.0) {UserColor = vec3(cos(time), sin(time), 1);} else if(gl_FragCoord.y - PointCentre.y <= 0.0) {UserColor = vec3(sin(time), 1, cos(time));};} else if(gl_FragCoord.x - PointCentre.x < 0.0) {UserColor = vec3(1, sin(time), cos(time));}; float Dist = length(gl_FragCoord.xy - Point); vec3 PointColor = vec3(UserColor.x * .1 * gl_FragCoord.x / Dist, UserColor.y * .1 * gl_FragCoord.x / Dist, UserColor.z * .1 * gl_FragCoord.x / Dist); color_01 = vec3(PointColor.x, PointColor.y, PointColor.z); gl_FragColor = vec4(color_01, 1);}

@@ -1,0 +1,1 @@
+void main( void ) { precision mediump float; }
